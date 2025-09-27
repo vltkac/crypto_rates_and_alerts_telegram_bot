@@ -10,7 +10,7 @@ ALERTS_REACHED = set()
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    #global ALERT_ID
+    global ALERT_ID
 
     await update.message.reply_text("Welcome to the crypto alert bot! 💵"
                                     "\n\n🏷️ To check the price of the crypto now use /price (e. g. /price BTC)."
@@ -19,8 +19,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                     "\n\n💎 Available currencies 💎\n"
                                     "BTC ETH USDT SOL DOGE")
 
-    # with open('current_alert_id.txt', 'r') as f:
-    #     ALERT_ID = f.read()
+    with open('users_alerts.json', 'r', encoding='utf-8') as f:
+        try:
+            alerts = json.load(f)
+
+            ALERT_ID = max(alerts, key=lambda al: al['alert_id'])['alert_id'] + 1
+        except json.decoder.JSONDecodeError:
+            ALERT_ID = 0
+
 
 async def price(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
@@ -67,7 +73,6 @@ async def market(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         for currency in data:
             price_now = data[currency]['usd']
-
             market_now_message += f'{currency.upper()} {price_now} USD\n'
 
         await update.message.reply_text(market_now_message)
@@ -101,6 +106,13 @@ async def alert(update: Update, context: ContextTypes.DEFAULT_TYPE):
     alert_sign = context.args[1]
     alert_price = context.args[2]
 
+    with open('users_alerts.json', 'r', encoding='utf-8') as f:
+        try:
+            alerts = json.load(f)
+            ALERT_ID = max(alerts, key=lambda al: al['alert_id'])['alert_id'] + 1
+        except json.decoder.JSONDecodeError:
+            ALERT_ID = 0
+
     user_alert = {
         'alert_id': ALERT_ID,
         'chat_id': update.effective_chat.id,
@@ -114,7 +126,6 @@ async def alert(update: Update, context: ContextTypes.DEFAULT_TYPE):
     with open('users_alerts.json', 'r', encoding='utf-8') as f:
         try:
             data = json.load(f)
-
         except json.decoder.JSONDecodeError:
             data = []
 
@@ -125,7 +136,6 @@ async def alert(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ALERT_ID += 1
 
     await update.message.reply_text('Your alert was saved successfully. You will receive a message from the bot when the price reaches your alert price.')
-
     return None
 
 
@@ -134,9 +144,7 @@ async def check_alerts(context: ContextTypes.DEFAULT_TYPE):
         with open('users_alerts.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
 
-        response = requests.get(
-            'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether,solana,doge&vs_currencies=usd')
-
+        response = requests.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether,solana,doge&vs_currencies=usd')
         rates_now = response.json()
 
         for alert in data:
@@ -153,7 +161,6 @@ async def check_alerts(context: ContextTypes.DEFAULT_TYPE):
                     if eval(str(price_now) + alert_sign + str(alert_price)):
                         ALERTS_REACHED.add(alert_id)
                         await context.bot.send_message(chat_id=alert_user, text=f'{alert_crypto.upper()} reached your alert price {alert_price} USD.')
-
     except requests.exceptions.RequestException as err:
         print(f'Network connection error occurred: {err}')
     except json.decoder.JSONDecodeError:
@@ -164,7 +171,6 @@ async def remove_checked_alerts(context: ContextTypes.DEFAULT_TYPE):
     with open('users_alerts.json', 'r', encoding='utf-8') as f:
         try:
             data = json.load(f)
-
         except json.decoder.JSONDecodeError:
             data = []
             return
