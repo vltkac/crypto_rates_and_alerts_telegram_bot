@@ -182,7 +182,7 @@ async def remove_checked_alerts(context: ContextTypes.DEFAULT_TYPE):
 
 
 if __name__ == '__main__':
-    app = ApplicationBuilder().token("TELEGRAM TOKEN").build()
+    app = ApplicationBuilder().token("YOUR_TELEGRAM_BOT_TOKEN").build()
 
     if not os.path.exists("users_alerts.json"):
         with open("users_alerts.json", "w", encoding="utf-8"):
