@@ -1,5 +1,6 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from dotenv import load_dotenv
 import requests, asyncio, json, os
 
 
@@ -182,7 +183,9 @@ async def remove_checked_alerts(context: ContextTypes.DEFAULT_TYPE):
 
 
 if __name__ == '__main__':
-    app = ApplicationBuilder().token("YOUR_TELEGRAM_BOT_TOKEN").build()
+    load_dotenv()
+    TOKEN = os.getenv('BOT_TOKEN')
+    app = ApplicationBuilder().token(TOKEN).build()
 
     if not os.path.exists("users_alerts.json"):
         with open("users_alerts.json", "w", encoding="utf-8"):

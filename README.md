@@ -22,11 +22,14 @@ When an alert condition is met, the bot sends you a notification in Telegram.
 - Python 3.9+
 - [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) v20+
 - `requests`
+- `python-dotenv`
 
 Install dependencies:
 
 ```bash
-pip install python-telegram-bot requests
+pip install python-telegram-bot
+pip install requests
+pip install python-dotenv
 ```
 
 ---
@@ -37,10 +40,12 @@ pip install python-telegram-bot requests
 
 2. Create a bot via [@BotFather](https://t.me/BotFather) on Telegram and get your API token.
 
-3. Add your token to `main.py`:
+3. Add your token to `.env`:
 
 ```python
-app = ApplicationBuilder().token("YOUR_TELEGRAM_BOT_TOKEN").build()
+    load_dotenv()
+    TOKEN = os.getenv('BOT_TOKEN')
+    app = ApplicationBuilder().token(TOKEN).build()
 ```
 
 4. Run the bot:
