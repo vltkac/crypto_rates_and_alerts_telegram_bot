@@ -1,52 +1,83 @@
-# Telegram Crypto Alert Bot
+# Crypto Alert Bot
 
-## Description
-This Telegram bot allows users to monitor cryptocurrency prices and set alerts for specific price thresholds. Users can:
-- Check the current price of supported cryptocurrencies.
-- View the market prices of all supported cryptocurrencies.
-- Set custom alerts that notify them when a cryptocurrency reaches a specified price.
+A simple Telegram bot that allows you to check cryptocurrency prices and set alerts for specific price levels.  
+The bot uses the [CoinGecko API](https://www.coingecko.com/en/api) for live market data and stores user alerts in a local JSON file.
 
-Supported cryptocurrencies:
-- BTC (Bitcoin)
-- ETH (Ethereum)
-- USDT (Tether)
-- SOL (Solana)
-- DOGE (Dogecoin)
-
-Alerts are stored in a JSON file, and the bot periodically checks prices to notify users.
+---
 
 ## Features
-- Get cryptocurrency prices in real time using the CoinGecko API.
-- Set alerts for when a currency goes above or below a specific price.
-- Alerts are persistent and stored in `users_alerts.json`.
-- Automated checking of alerts with job scheduling (via `python-telegram-bot` job queue).
 
-## Installation
-1. Clone this repository.
-2. Install dependencies:
+- `/start` — show welcome message and instructions.
+- `/price <crypto>` — check the current price of a specific cryptocurrency (BTC, ETH, USDT, SOL, DOGE).
+- `/market` — display prices of all available cryptocurrencies at once.
+- `/alert <crypto> <sign> <price>` — set a price alert.  
+  Example: `/alert BTC >= 50000` or `/alert ETH <= 2000`.
+
+When an alert condition is met, the bot sends you a notification in Telegram.
+
+---
+
+## Requirements
+
+- Python 3.9+
+- [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) v20+
+- `requests`
+
+Install dependencies:
+
 ```bash
 pip install python-telegram-bot requests
 ```
-3. Replace `"TELEGRAM TOKEN"` in the code with your Telegram bot token.
 
-## Usage
-Run the bot:
+---
+
+## Setup
+
+1. Clone the repository or copy the project files.
+
+2. Create a bot via [@BotFather](https://t.me/BotFather) on Telegram and get your API token.
+
+3. Add your token to `main.py`:
+
+```python
+app = ApplicationBuilder().token("YOUR_TELEGRAM_BOT_TOKEN").build()
+```
+
+4. Run the bot:
+
 ```bash
 python main.py
 ```
-Bot commands:
-- `/start` — display welcome message and instructions.
-- `/price <CRYPTO>` — get the current price of a cryptocurrency.
-- `/market` — get current prices of all supported cryptocurrencies.
-- `/alert <CRYPTO> <>= or <= > <PRICE>` — set an alert for a cryptocurrency.
+
+---
+
+## Data Storage
+
+- Alerts are stored in a local JSON file: `users_alerts.json`. Bot will create this file in the directory of the main.py automatically.
+
+
+---
 
 ## Notes
-- Alerts are checked every 30 seconds.
-- The bot uses the CoinGecko API, which may have request limits.
 
-## Example
-Set an alert for Bitcoin when it reaches $100,000:
+- Alerts are checked automatically every 30 seconds.
+- Triggered alerts are removed from `users_alerts.json` so they won't repeat.
+- The bot supports multiple users, each alert is tied to the user’s chat ID.
+
+---
+
+## Example Usage
+
 ```
-/alert BTC >= 100000
+/start
+/price BTC
+/market
+/alert BTC >= 50000
+/alert ETH <= 2000
 ```
-You will receive a message from the bot when the price threshold is reached.
+
+---
+
+## License
+
+MIT License

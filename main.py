@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-import requests, asyncio, json
+import requests, asyncio, json, os
 
 
 CRYPTO_INSERTIONS = {'btc', 'bitcoin', 'tether', 'usdt', 'ethereum', 'eth', 'solana', 'sol', 'doge'}
@@ -183,6 +183,10 @@ async def remove_checked_alerts(context: ContextTypes.DEFAULT_TYPE):
 
 if __name__ == '__main__':
     app = ApplicationBuilder().token("TELEGRAM TOKEN").build()
+
+    if not os.path.exists("users_alerts.json"):
+        with open("users_alerts.json", "w", encoding="utf-8"):
+            pass
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("price", price))
